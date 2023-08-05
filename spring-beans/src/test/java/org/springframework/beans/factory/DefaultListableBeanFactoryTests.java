@@ -926,6 +926,29 @@ class DefaultListableBeanFactoryTests {
 		assertThat(r.getName().equals(name)).isTrue();
 	}
 
+	/**
+	 * 这是一个使用 Spring Framework 的单元测试示例，用于测试自定义属性编辑器的功能。在这个测试用例中，
+	 * 我们为 Float 类型的属性注册了一个自定义属性编辑器，使用德国语言环境的 NumberFormat。接下来，我们创建一个 TestBean 的 bean 定义，
+	 * 并为其设置一个带有逗号分隔符的浮点数属性。最后，我们检查从 Spring 容器获取的 TestBean 实例是否具有正确解析的浮点数值。
+	 *
+	 * 以下是该测试用例的逐行解释：
+	 *
+	 * @Test: 这是 JUnit 的注解，表示这是一个单元测试方法。
+	 * void customEditor() {: 定义一个名为 customEditor 的测试方法。
+	 * lbf.addPropertyEditorRegistrar(registry -> { ... });: 为 lbf（一个 BeanFactory 实例）添加一个自定义属性编辑器注册器。
+	 * 注册器是一个 lambda 表达式，它接受一个 PropertyEditorRegistry 参数，并为 Float 类型注册一个自定义属性编辑器。
+	 * 这个编辑器使用德国语言环境的 NumberFormat，允许使用逗号作为小数分隔符。
+	 * MutablePropertyValues pvs = new MutablePropertyValues();: 创建一个 MutablePropertyValues 对象，用于存储 bean 属性的键值对。
+	 * pvs.add("myFloat", "1,1");: 向 MutablePropertyValues 对象添加一个名为 "myFloat" 的属性，值为 "1,1"（使用德国语言环境的小数分隔符）。
+	 * RootBeanDefinition bd = new RootBeanDefinition(TestBean.class);: 创建一个 TestBean 类型的 RootBeanDefinition 对象。
+	 * bd.setPropertyValues(pvs);: 将包含 "myFloat" 属性的 MutablePropertyValues 对象设置为 TestBean 的属性值。
+	 * lbf.registerBeanDefinition("testBean", bd);: 在 BeanFactory 中注册名为 "testBean" 的 TestBean 定义。
+	 * TestBean testBean = (TestBean) lbf.getBean("testBean");: 从 BeanFactory 获取名为 "testBean" 的 TestBean 实例。
+	 * assertThat(testBean.getMyFloat().floatValue() == 1.1f).isTrue();: 检查 TestBean 实例的 "myFloat" 属性是否正确解析为 1.1f。
+	 * 如果是，则测试通过；否则，测试失败。
+	 * 这个测试用例演示了如何使用 Spring Framework 的自定义属性编辑器功能，在解析 bean 属性值时使用特定于语言环境的格式。在这种情况下，
+	 * 我们使用德国语言环境的小数分隔符（逗号）正确解析了一个浮点数值。
+	 */
 	@Test
 	void customEditor() {
 		lbf.addPropertyEditorRegistrar(registry -> {

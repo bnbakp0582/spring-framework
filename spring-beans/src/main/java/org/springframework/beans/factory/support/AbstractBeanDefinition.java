@@ -162,6 +162,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+	// TODO 用于提供bean实例的Supplier
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
@@ -175,9 +176,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String factoryMethodName;
 
+	// bean的构造函数的参数
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
+	// bean的属性值
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
