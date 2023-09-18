@@ -513,12 +513,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// which cannot be stored in the shared merged bean definition.
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+			// 进到这里说明是动态解析的class
+			// 这样做的原因是，动态解析的类不能存储在共享的合并 bean 定义中，因为它可能会影响其他地方对该 bean 的使用。
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
 		// Prepare method overrides.
 		try {
+			// 方法重写是一个相对少见的特性，通常在更高级的应用场景中使用。
 			mbdToUse.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -528,6 +531,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+
+			// 这种机制允许我们在 bean 实例化之前应用一些高级处理逻辑，例如创建 AOP 代理。
+			// 通过返回一个代理对象，我们可以在运行时拦截 bean 方法的调用，
+			// 实现诸如事务管理、日志记录等功能。需要注意的是，BeanPostProcessor 是一个非常强大的扩展点，
+			// 但也容易导致代码变得复杂。使用时应该谨慎，并确保遵循良好的设计原则。
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -603,6 +611,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
+		/**
+		 * 这行代码定义了一个布尔变量 earlySingletonExposure，用于确定是否需要提前暴露单例 Bean 以解决循环引用。变量的值取决于以下三个条件：
+		 *
+		 * mbd.isSingleton(): 当前 Bean 是否是一个单例。mbd 是一个 RootBeanDefinition 对象，包含了 Bean 的元数据，如作用域（singleton、prototype 等）、构造函数参数、属性值等。
+		 *
+		 * this.allowCircularReferences: 当前的 BeanFactory 是否允许循环引用。这是一个布尔值，可以在配置 BeanFactory 时进行设置。默认情况下，Spring 允许循环引用。
+		 *
+		 * isSingletonCurrentlyInCreation(beanName): 当前的单例 Bean 是否正在被创建。这个方法检查给定名称的单例 Bean 是否已经在创建过程中，但尚未完成。
+		 *
+		 * 当以上三个条件都为真时，earlySingletonExposure 为 true。这意味着在创建单例 Bean 时，需要提前暴露该 Bean，以便解决可能出现的循环引用问题。
+		 * 提前暴露意味着将 Bean 的一个早期引用（尚未完全初始化的对象）放入单例缓存中，以便在解析循环依赖时可以获取到这个引用。
+		 *
+		 * 这种处理方式使得 Spring 可以在 Bean 之间存在循环依赖的情况下，仍然能够成功创建和初始化 Bean。
+		 */
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
@@ -616,6 +638,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
+			// populateBean 方法仅负责属性注入。如果当前 bean 的属性 bean 还未初始化，
+			// populateBean 方法会触发这些属性 bean 的创建和初始化。这样，在返回当前 bean 实例时，所有的属性 bean 都已经被正确初始化并注入。
 			populateBean(beanName, mbd, instanceWrapper);
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}

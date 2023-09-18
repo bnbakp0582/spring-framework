@@ -653,6 +653,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * <p>Note that dependencies are normally expressed through bean properties or
 	 * constructor arguments. This property should just be necessary for other kinds
 	 * of dependencies like statics (*ugh*) or database preparation on startup.
+	 *
+	 * 需要注意的是，通常情况下，我们通过 bean 属性或构造器参数来表示依赖关系。
+	 * depends-on 属性通常用于处理其他类型的依赖关系，例如静态依赖或启动时的数据库准备等。
 	 */
 	@Override
 	public void setDependsOn(@Nullable String... dependsOn) {
